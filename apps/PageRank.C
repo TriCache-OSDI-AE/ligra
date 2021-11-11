@@ -35,22 +35,25 @@ struct PR_F {
     return 1;
   }
   inline bool updateAtomic (uintE s, uintE d) { //atomic Update
-    writeAdd(&p_next[d],p_curr[s]/V[s].getOutDegree());
+    writeAdd(&p_next[d],p_curr[s]);
     return 1;
   }
   inline bool cond (intT d) { return cond_true(d); }};
 
 //vertex map function to update its p value according to PageRank equation
+template <class vertex>
 struct PR_Vertex_F {
   double damping;
   double addedConstant;
   double* p_curr;
   double* p_next;
-  PR_Vertex_F(double* _p_curr, double* _p_next, double _damping, intE n) :
+  vertex* V;
+  PR_Vertex_F(double* _p_curr, double* _p_next, double _damping, intE n, vertex* _V) :
     p_curr(_p_curr), p_next(_p_next), 
-    damping(_damping), addedConstant((1-_damping)*(1/(double)n)){}
+    damping(_damping), addedConstant((1-_damping)*(1/(double)n)), V(_V){}
   inline bool operator () (uintE i) {
     p_next[i] = damping*p_next[i] + addedConstant;
+    if (V[i].getOutDegree() != 0) p_next[i] /= V[i].getOutDegree();
     return 1;
   }
 };
@@ -85,7 +88,7 @@ void Compute(graph<vertex>& GA, commandLine P) {
   long iter = 0;
   while(iter++ < maxIters) {
     edgeMap(GA,Frontier,PR_F<vertex>(p_curr,p_next,GA.V),0, no_output);
-    vertexMap(Frontier,PR_Vertex_F(p_curr,p_next,damping,n));
+    vertexMap(Frontier,PR_Vertex_F<vertex>(p_curr,p_next,damping,n,GA.V));
     //compute L1-norm between p_curr and p_next
     {parallel_for(long i=0;i<n;i++) {
       p_curr[i] = fabs(p_curr[i]-p_next[i]);
