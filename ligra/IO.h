@@ -37,6 +37,7 @@
 #include "quickSort.h"
 #include "utils.h"
 #include "graph.h"
+#include <parallel/algorithm>
 using namespace std;
 
 typedef pair<uintE,uintE> intPair;
@@ -256,13 +257,15 @@ graph<vertex> readGraphFromFile(char* fname, bool isSymmetric, bool mmap) {
 #ifndef LOWMEM
     intSort::iSort(temp,m,n+1,getFirst<uintE>());
 #else
-    quickSort(temp,m,pairFirstCmp<uintE>());
+    __gnu_parallel::sort(temp,temp+m,pairFirstCmp<uintE>());
+    // quickSort(temp,m,pairFirstCmp<uintE>());
 #endif
 #else
 #ifndef LOWMEM
     intSort::iSort(temp,m,n+1,getFirst<intPair>());
 #else
-    quickSort(temp,m,pairFirstCmp<intPair>());
+    __gnu_parallel::sort(temp,temp+m,pairFirstCmp<uintE>());
+    // quickSort(temp,m,pairFirstCmp<intPair>());
 #endif
 #endif
 
