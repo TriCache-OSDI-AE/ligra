@@ -37,7 +37,6 @@
 #include "quickSort.h"
 #include "utils.h"
 #include "graph.h"
-#include <parallel/algorithm>
 using namespace std;
 
 typedef pair<uintE,uintE> intPair;
@@ -257,15 +256,13 @@ graph<vertex> readGraphFromFile(char* fname, bool isSymmetric, bool mmap) {
 #ifndef LOWMEM
     intSort::iSort(temp,m,n+1,getFirst<uintE>());
 #else
-    __gnu_parallel::sort(temp,temp+m,pairFirstCmp<uintE>());
-    // quickSort(temp,m,pairFirstCmp<uintE>());
+    quickSort(temp,m,pairFirstCmp<uintE>());
 #endif
 #else
 #ifndef LOWMEM
     intSort::iSort(temp,m,n+1,getFirst<intPair>());
 #else
-    __gnu_parallel::sort(temp,temp+m,pairFirstCmp<uintE>());
-    // quickSort(temp,m,pairFirstCmp<intPair>());
+    quickSort(temp,m,pairFirstCmp<intPair>());
 #endif
 #endif
 
@@ -385,6 +382,41 @@ graph<vertex> readGraphFromBinary(char* iFile, bool isSymmetric) {
     }}
 
   if(!isSymmetric) {
+#if true
+    char* radj = (char*) ".radj";
+    char* ridx = (char*) ".ridx";
+    char radjFile[strlen(iFile)+strlen(radj)+1];
+    char ridxFile[strlen(iFile)+strlen(ridx)+1];
+    *radjFile = *ridxFile = '\0';
+    strcat(radjFile,iFile);
+    strcat(ridxFile,iFile);
+    strcat(radjFile,radj);
+    strcat(ridxFile,ridx);
+
+    ifstream in4(radjFile,ifstream::in | ios::binary); //stored as uints
+    in4.seekg(0, ios::end);
+    long size = in4.tellg();
+    in4.seekg(0);
+    char* rs = (char *) malloc(size);
+    in4.read(rs,size);
+    in4.close();
+    uintE* redges = (uintE*) rs;
+
+    ifstream in5(ridxFile,ifstream::in | ios::binary); //stored as longs
+    in5.seekg(0, ios::end);
+    size = in5.tellg();
+    in5.seekg(0);
+    if(n != size/sizeof(intT)) { cout << "File size wrong\n"; abort(); }
+
+    char* rt = (char *) malloc(size);
+    in5.read(rt,size);
+    in5.close();
+    uintT* roffsets = (uintT*) rt;
+
+    uintE* inEdges = redges;
+    uintT* tOffsets = roffsets;
+#else
+
     uintT* tOffsets = newA(uintT,n);
     {parallel_for(long i=0;i<n;i++) tOffsets[i] = INT_T_MAX;}
 #ifndef WEIGHTED
@@ -440,6 +472,17 @@ graph<vertex> readGraphFromBinary(char* iFile, bool isSymmetric) {
     //fill in offsets of degree 0 vertices by taking closest non-zero
     //offset to the right
     sequence::scanIBack(tOffsets,tOffsets,n,minF<uintT>(),(uintT)m);
+#endif
+
+    // {parallel_for(long i=0;i<n;i++){
+    //   if(tOffsets[i] != roffsets[i])
+    //       printf("check offset error\n");
+    //   }}
+    // {parallel_for(long i=0;i<m;i++){
+    //   if(inEdges[i] != redges[i])
+    //       printf("check edge error\n");
+    //   }}
+
     {parallel_for(long i=0;i<n;i++){
       uintT o = tOffsets[i];
       uintT l = ((i == n-1) ? m : tOffsets[i+1])-tOffsets[i];

@@ -841,8 +841,8 @@ namespace benchIO {
     long n = W.m/2;
     edge<intT> *E = newA(edge<intT>,n);
     {parallel_for(long i=0; i < n; i++)
-      E[i] = edge<intT>(atol(W.Strings[2*i]), 
-		  atol(W.Strings[2*i + 1]));}
+      E[i] = edge<intT>(std::stol(W.Strings[2*i]), 
+		  std::stol(W.Strings[2*i + 1]));}
     W.del();
 
     long maxR = 0;
@@ -874,9 +874,9 @@ namespace benchIO {
     long n = W.m/3;
     wghEdge<intT> *E = newA(wghEdge<intT>,n);
     {parallel_for(long i=0; i < n; i++)
-      E[i] = wghEdge<intT>(atol(W.Strings[3*i]), 
-			atol(W.Strings[3*i + 1]),
-			atol(W.Strings[3*i + 2]));}
+      E[i] = wghEdge<intT>(std::stol(W.Strings[3*i]), 
+			std::stol(W.Strings[3*i + 1]),
+			std::stol(W.Strings[3*i + 2]));}
     W.del();
 
     long maxR = 0;
@@ -916,8 +916,8 @@ namespace benchIO {
 	long offset = W.Lines[i];
 	long degree = (i == nh-1) ? m-W.Lines[i] : W.Lines[i+1]-W.Lines[i];
 	for(long j=0;j<degree;j++) {
-	  VE[offset+j] = edge<intT>(atol(W.Strings[offset+j]),i);
-	  HE[offset+j] = edge<intT>(i,atol(W.Strings[offset+j]));
+	  VE[offset+j] = edge<intT>(std::stol(W.Strings[offset+j]),i);
+	  HE[offset+j] = edge<intT>(i,std::stol(W.Strings[offset+j]));
 	}
       }} 
     W.del();
@@ -968,8 +968,8 @@ namespace benchIO {
 	long offset = W.Lines[2*i];
 	long degree = W.Lines[2*i+1]-W.Lines[2*i];
 	for(long j=0;j<degree;j++) {
-	  VE[offset+j-i] = wghEdge<intT>(atol(W.Strings[offset+j]),i,atol(W.Strings[W.Lines[2*i+1]]));
-	  HE[offset+j-i] = wghEdge<intT>(i,atol(W.Strings[offset+j]),atol(W.Strings[W.Lines[2*i+1]]));
+	  VE[offset+j-i] = wghEdge<intT>(std::stol(W.Strings[offset+j]),i,std::stol(W.Strings[W.Lines[2*i+1]]));
+	  HE[offset+j-i] = wghEdge<intT>(i,std::stol(W.Strings[offset+j]),std::stol(W.Strings[W.Lines[2*i+1]]));
 	}
       }} 
     W.del();
@@ -1016,9 +1016,9 @@ namespace benchIO {
     edge<intT> *HE = newA(edge<intT>,m);
 
     {parallel_for(long i=0; i < m; i++) {
-	VE[i] = edge<intT>(atol(W.Strings[2*i]), 
-			  atol(W.Strings[2*i + 1]));
-	HE[i] = edge<intT>(atol(W.Strings[2*i+1]),atol(W.Strings[2*i]));
+	VE[i] = edge<intT>(std::stol(W.Strings[2*i]), 
+			  std::stol(W.Strings[2*i + 1]));
+	HE[i] = edge<intT>(std::stol(W.Strings[2*i+1]),std::stol(W.Strings[2*i]));
       }}
     W.del();
 
@@ -1073,12 +1073,12 @@ namespace benchIO {
     wghEdge<intT> *HE = newA(wghEdge<intT>,m);
 
     {parallel_for(long i=0; i < m; i++) {
-	VE[i] = wghEdge<intT>(atol(W.Strings[4*i]), 
-			   atol(W.Strings[4*i+1]),
-			   atol(W.Strings[4*i+2]));
-	HE[i] = wghEdge<intT>(atol(W.Strings[4*i+1]),
-			   atol(W.Strings[4*i]),
-			   atol(W.Strings[4*i+2]));
+	VE[i] = wghEdge<intT>(std::stol(W.Strings[4*i]), 
+			   std::stol(W.Strings[4*i+1]),
+			   std::stol(W.Strings[4*i+2]));
+	HE[i] = wghEdge<intT>(std::stol(W.Strings[4*i+1]),
+			   std::stol(W.Strings[4*i]),
+			   std::stol(W.Strings[4*i+2]));
       }}
     W.del();
 
@@ -1121,7 +1121,7 @@ namespace benchIO {
 
     long len = W.m -1;
     uintT * In = newA(uintT, len);
-    {parallel_for(long i=0; i < len; i++) In[i] = atol(W.Strings[i + 1]);}
+    {parallel_for(long i=0; i < len; i++) In[i] = std::stol(W.Strings[i + 1]);}
     W.del();
     
     long n = In[0];
@@ -1155,7 +1155,7 @@ namespace benchIO {
     
     long len = W.m -1;
     intT * In = newA(intT, len);
-    {parallel_for(long i=0; i < len; i++) In[i] = atol(W.Strings[i + 1]);}
+    {parallel_for(long i=0; i < len; i++) In[i] = std::stol(W.Strings[i + 1]);}
     W.del();
     
     long n = In[0];
@@ -1190,7 +1190,7 @@ namespace benchIO {
 
     long len = W.m -1;
     uintT * In = newA(uintT, len);
-    {parallel_for(long i=0; i < len; i++) In[i] = atol(W.Strings[i + 1]);}
+    {parallel_for(long i=0; i < len; i++) In[i] = std::stol(W.Strings[i + 1]);}
     W.del();
     
     long nv = In[0];
@@ -1236,7 +1236,7 @@ namespace benchIO {
     
     long len = W.m -1;
     intT * In = newA(intT, len);
-    {parallel_for(long i=0; i < len; i++) In[i] = atol(W.Strings[i + 1]);}
+    {parallel_for(long i=0; i < len; i++) In[i] = std::stol(W.Strings[i + 1]);}
     W.del();
     
     long nv = In[0];
