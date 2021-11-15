@@ -33,8 +33,11 @@ PCC = icpc
 PCFLAGS = -std=c++14 -O3 -DCILKP $(INTT) $(INTE) $(CODE) $(PD) $(MEM)
 
 else ifdef OPENMP
-PCC = g++
-PCFLAGS = -std=c++14 -fopenmp -march=native -O3 -DOPENMP $(INTT) $(INTE) $(CODE) $(PD) $(MEM)
+# PCC = g++
+# PCFLAGS = -std=c++14 -fopenmp -march=native -O3 -DOPENMP $(INTT) $(INTE) $(CODE) $(PD) $(MEM)
+PCC = clang++-13
+#PCFLAGS = -std=c++14 -fopenmp -march=native -O3 -DOPENMP $(INTT) $(INTE) $(CODE) $(PD) $(MEM)
+PCFLAGS = -std=c++14 -fopenmp -march=native -O3 -DOPENMP $(INTT) $(INTE) $(CODE) $(PD) $(MEM) -fpass-plugin=/home/jiguanglizipao/ScalableCache/build-libcache/llvm-plugin/ScalableCacheInstrument/ScalableCacheInstrument.so -fpass-plugin=/home/jiguanglizipao/ScalableCache/build-libcache/llvm-plugin/ScalableCacheAlloc/ScalableCacheAlloc.so -I/home/jiguanglizipao/cache_bind/ -L/home/jiguanglizipao/cache_bind/ -L/usr/lib/llvm-13/lib /home/jiguanglizipao/cache_bind/libcache.a -pthread -lboost_fiber -lboost_context -lboost_thread -lnuma -pthread -ldl -fopenmp $(shell pkg-config --libs spdk_nvme spdk_env_dpdk spdk_syslibs) -flto=thin 
 
 else
 PCC = g++
@@ -48,7 +51,7 @@ ALL= encoder decoder BFS BC BellmanFord Components Components-Shortcut Radii Pag
 all: $(ALL)
 
 % : %.C $(COMMON)
-	$(PCC) $(PCFLAGS) -o $@ $<
+	$(PCC) $< -o $@ $(PCFLAGS) 
 
 $(COMMON):
 	ln -s ../ligra/$@ .
