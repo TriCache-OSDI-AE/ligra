@@ -40,6 +40,32 @@ struct CC_F {
   inline bool cond (uintE d) { return cond_true(d); } //does nothing
 };
 
+inline bool IDupdate(uintE *u, uintE new_value) {
+  uintE cur = *u;
+  bool r;
+  do cur = *u; 
+  while (cur / 2 > new_value / 2 && !(r = CAS(u, cur, new_value)));
+  return r && (cur % 2 == 1);
+}
+
+struct CC2_F {
+  uintE* IDs;
+  CC2_F(uintE* _IDs) : IDs(_IDs) {}
+  inline bool update(uintE s, uintE d) {
+    uintE origID = IDs[d];
+    if (IDs[s] / 2 < origID / 2) {
+      uintE previous = IDs[d];
+      IDs[d] = IDs[s] / 2 * 2;
+      return previous & 1;
+    }
+    return 0;
+  }
+  inline bool updateAtomic(uintE s, uintE d) {
+    return IDupdate(&IDs[d], IDs[s] / 2 * 2);
+  }
+  inline bool cond(uintE d) { return cond_true(d); }
+};
+
 //function used by vertex map to sync prevIDs with IDs
 struct CC_Vertex_F {
   uintE* IDs, *prevIDs;
@@ -49,21 +75,34 @@ struct CC_Vertex_F {
     prevIDs[i] = IDs[i];
     return 1; }};
 
+struct CC2_Vertex_F{
+  uintE* IDs;
+  CC2_Vertex_F(uintE *_IDs) : IDs(_IDs) {}
+  inline bool operator() (uintE i) {
+    IDs[i] |= 1;
+    return 1;
+  }
+};
+
 template <class vertex>
 void Compute(graph<vertex>& GA, commandLine P) {
   long n = GA.n;
-  uintE* IDs = newA(uintE,n), *prevIDs = newA(uintE,n);
-  {parallel_for(long i=0;i<n;i++) IDs[i] = i;} //initialize unique IDs
+  uintE* IDs = newA(uintE,n); //, *prevIDs = newA(uintE,n);
+  {parallel_for(long i=0;i<n;i++) IDs[i] = i * 2 + 1;} //initialize unique IDs
 
   bool* frontier = newA(bool,n);
   {parallel_for(long i=0;i<n;i++) frontier[i] = 1;} 
   vertexSubset Frontier(n,n,frontier); //initial frontier contains all vertices
 
-  while(!Frontier.isEmpty()){ //iterate until IDS converge
-    vertexMap(Frontier,CC_Vertex_F(IDs,prevIDs));
-    vertexSubset output = edgeMap(GA, Frontier, CC_F(IDs,prevIDs));
+  int iter = 0;
+  // some bug??
+  while(!Frontier.isEmpty() && Frontier.numNonzeros() != 0){ //iterate until IDS converge
+    vertexMap(Frontier,CC2_Vertex_F(IDs));
+    vertexSubset output = edgeMap(GA, Frontier, CC2_F(IDs), INT_MAX);
     Frontier.del();
     Frontier = output;
+    //fprintf(stderr, "iter = %d, F_SIZE = %ld\n", iter++, Frontier.numNonzeros());
   }
-  Frontier.del(); free(IDs); free(prevIDs);
+  {parallel_for(long i = 0;i < n; i++) IDs[i] = IDs[i] / 2; }
+  Frontier.del(); free(IDs); //free(prevIDs);
 }

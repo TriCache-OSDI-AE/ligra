@@ -24,33 +24,33 @@
 #include "ligra.h"
 
 struct BFS_F {
-  uintE* Parents;
-  BFS_F(uintE* _Parents) : Parents(_Parents) {}
+  bool *Parent;
+  BFS_F(bool* _Parent) : Parent(_Parent) {}
   inline bool update (uintE s, uintE d) { //Update
-    if(Parents[d] == UINT_E_MAX) { Parents[d] = s; return 1; }
+    if(Parent[d] == false) { Parent[d] = true; return 1; }
     else return 0;
   }
   inline bool updateAtomic (uintE s, uintE d){ //atomic version of Update
-    return (CAS(&Parents[d],UINT_E_MAX,s));
+    return (CAS(&Parent[d],false,true));
   }
   //cond function checks if vertex has been visited yet
-  inline bool cond (uintE d) { return (Parents[d] == UINT_E_MAX); } 
+  inline bool cond (uintE d) { return (Parent[d] == false); } 
 };
 
 template <class vertex>
 void Compute(graph<vertex>& GA, commandLine P) {
   long start = P.getOptionLongValue("-r",0);
   long n = GA.n;
-  //creates Parents array, initialized to all -1, except for start
-  uintE* Parents = newA(uintE,n);
-  parallel_for(long i=0;i<n;i++) Parents[i] = UINT_E_MAX;
-  Parents[start] = start;
+  //creates Parent array, initialized to all -1, except for start
+  bool* Parent = newA(bool,n);
+  parallel_for(long i=0;i<n;i++) Parent[i] = false;
+  Parent[start] = true;
   vertexSubset Frontier(n,start); //creates initial frontier
   while(!Frontier.isEmpty()){ //loop until frontier is empty
-    vertexSubset output = edgeMap(GA, Frontier, BFS_F(Parents));    
+    vertexSubset output = edgeMap(GA, Frontier, BFS_F(Parent), INT_MAX);    
     Frontier.del();
     Frontier = output; //set new frontier
   } 
   Frontier.del();
-  free(Parents); 
+  free(Parent); 
 }

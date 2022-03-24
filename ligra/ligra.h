@@ -55,6 +55,9 @@ const flags no_dense = 64;
 const flags edge_parallel = 128;
 inline bool should_output(const flags& fl) { return !(fl & no_output); }
 
+extern "C" void cache_reset_profile();
+extern "C" void cache_dump_profile();
+
 template <class data, class vertex, class VS, class F>
 vertexSubsetData<data> edgeMapDense(graph<vertex> GA, VS& vertexSubset, F &f, const flags fl) {
   using D = tuple<bool, data>;
@@ -489,9 +492,11 @@ int parallel_main(int argc, char* argv[]) {
 #endif
       Compute(G,P);
       for(int r=0;r<rounds;r++) {
+        cache_reset_profile();
         startTime();
         Compute(G,P);
         nextTime("Running time");
+        cache_dump_profile();
       }
       G.del();
     } else {
@@ -505,10 +510,12 @@ int parallel_main(int argc, char* argv[]) {
       Compute(G,P);
       if(G.transposed) G.transpose();
       for(int r=0;r<rounds;r++) {
+        cache_reset_profile();
         startTime();
         Compute(G,P);
         nextTime("Running time");
         if(G.transposed) G.transpose();
+        cache_dump_profile();
       }
       G.del();
     }
@@ -523,9 +530,11 @@ int parallel_main(int argc, char* argv[]) {
 #endif
       Compute(G,P);
       for(int r=0;r<rounds;r++) {
+        cache_reset_profile();
         startTime();
         Compute(G,P);
         nextTime("Running time");
+        cache_dump_profile();
       }
       G.del();
     } else {
@@ -539,10 +548,12 @@ int parallel_main(int argc, char* argv[]) {
       Compute(G,P);
       if(G.transposed) G.transpose();
       for(int r=0;r<rounds;r++) {
+        cache_reset_profile();
         startTime();
         Compute(G,P);
         nextTime("Running time");
         if(G.transposed) G.transpose();
+        cache_dump_profile();
       }
       G.del();
     }

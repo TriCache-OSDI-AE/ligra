@@ -77,9 +77,9 @@ static void setWorkers(int n) {
 #define cilk_spawn
 #define cilk_sync
 #define parallel_main main
-#define parallel_for _Pragma("omp parallel for schedule (dynamic,64)") for
-#define parallel_for_1 _Pragma("omp parallel for schedule (dynamic,64)") for
-#define parallel_for_64 _Pragma("omp parallel for schedule (dynamic,64)") for
+#define parallel_for _Pragma("omp parallel for schedule (runtime)") for
+#define parallel_for_1 _Pragma("omp parallel for schedule (runtime)") for
+#define parallel_for_64 _Pragma("omp parallel for schedule (runtime)") for
 static int getWorkers() { return omp_get_max_threads(); }
 static void setWorkers(int n) { omp_set_num_threads(n); }
 
