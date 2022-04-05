@@ -94,15 +94,18 @@ void Compute(graph<vertex>& GA, commandLine P) {
   {parallel_for(long i=0;i<n;i++) frontier[i] = 1;} 
   vertexSubset Frontier(n,n,frontier); //initial frontier contains all vertices
 
-  int iter = 0;
-  // some bug??
   while(!Frontier.isEmpty() && Frontier.numNonzeros() != 0){ //iterate until IDS converge
     vertexMap(Frontier,CC2_Vertex_F(IDs));
     vertexSubset output = edgeMap(GA, Frontier, CC2_F(IDs), INT_MAX);
     Frontier.del();
     Frontier = output;
-    //fprintf(stderr, "iter = %d, F_SIZE = %ld\n", iter++, Frontier.numNonzeros());
   }
   {parallel_for(long i = 0;i < n; i++) IDs[i] = IDs[i] / 2; }
+
+  // long num_components = 0;
+  // #pragma omp parallel for schedule(runtime) reduction(+:num_components)
+  // for(long i=0;i<n;i++) num_components += IDs[i] == i;
+  // printf("number of communities: %lu\n", num_components);
+
   Frontier.del(); free(IDs); //free(prevIDs);
 }

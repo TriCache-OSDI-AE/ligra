@@ -119,7 +119,7 @@ void Compute(graph<vertex>& GA, commandLine P) {
       vertexFilter(All,PR_Vertex_F<vertex>(p,Delta,nghSum,damping,epsilon2));
     //compute L1-norm (use nghSum as temp array)
 
-    printf("iter = %ld NUM active = %ld\n", round, active.numNonzeros());
+    // printf("iter = %ld NUM active = %ld\n", round, active.numNonzeros());
     {parallel_for(long i=0;i<n;i++) {
       nghSum[i] = fabs(Delta[i]); }}
     float L1_norm = sequence::plusReduce(nghSum,n);
@@ -130,5 +130,13 @@ void Compute(graph<vertex>& GA, commandLine P) {
     Frontier.del();
     Frontier = active;
   }
+
+  // float max_pr = 0;
+  // long max_pr_id = 0;
+  // #pragma omp parallel for schedule(runtime) reduction(max:max_pr)
+  // for(long i=0;i<n;i++) max_pr = max_pr > p[i] ? max_pr : p[i];
+  // parallel_for(long i=0;i<n;i++) if(p[i] == max_pr) max_pr_id = i;
+  // printf("largest pr value is %f from %lu\n", max_pr, max_pr_id);
+
   Frontier.del(); free(p); free(Delta); free(nghSum); All.del();
 }

@@ -55,8 +55,13 @@ const flags no_dense = 64;
 const flags edge_parallel = 128;
 inline bool should_output(const flags& fl) { return !(fl & no_output); }
 
+#ifdef WITH_CACHE
 extern "C" void cache_reset_profile();
 extern "C" void cache_dump_profile();
+#else
+inline void cache_reset_profile() {}
+inline void cache_dump_profile() {}
+#endif
 
 template <class data, class vertex, class VS, class F>
 vertexSubsetData<data> edgeMapDense(graph<vertex> GA, VS& vertexSubset, F &f, const flags fl) {
@@ -490,7 +495,7 @@ int parallel_main(int argc, char* argv[]) {
       hypergraph<compressedSymmetricVertex> G =
         readCompressedHypergraph<compressedSymmetricVertex>(iFile,symmetric,mmap); //symmetric graph
 #endif
-      Compute(G,P);
+      // Compute(G,P);
       for(int r=0;r<rounds;r++) {
         cache_reset_profile();
         startTime();
@@ -507,7 +512,7 @@ int parallel_main(int argc, char* argv[]) {
       hypergraph<compressedAsymmetricVertex> G =
         readCompressedHypergraph<compressedAsymmetricVertex>(iFile,symmetric,mmap); //asymmetric graph
 #endif
-      Compute(G,P);
+      // Compute(G,P);
       if(G.transposed) G.transpose();
       for(int r=0;r<rounds;r++) {
         cache_reset_profile();
@@ -528,7 +533,7 @@ int parallel_main(int argc, char* argv[]) {
       hypergraph<symmetricVertex> G =
         readHypergraph<symmetricVertex>(iFile,compressed,symmetric,binary,mmap); //symmetric graph
 #endif
-      Compute(G,P);
+      // Compute(G,P);
       for(int r=0;r<rounds;r++) {
         cache_reset_profile();
         startTime();
@@ -545,7 +550,7 @@ int parallel_main(int argc, char* argv[]) {
       hypergraph<asymmetricVertex> G =
         readHypergraph<asymmetricVertex>(iFile,compressed,symmetric,binary,mmap); //asymmetric graph
 #endif
-      Compute(G,P);
+      // Compute(G,P);
       if(G.transposed) G.transpose();
       for(int r=0;r<rounds;r++) {
         cache_reset_profile();

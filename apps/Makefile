@@ -37,7 +37,7 @@ else ifdef OPENMP
 # PCFLAGS = -std=c++14 -fopenmp -march=native -O3 -DOPENMP $(INTT) $(INTE) $(CODE) $(PD) $(MEM)
 PCC = clang++-13
 # PCFLAGS = -std=c++14 -fopenmp -march=native -O3 -DOPENMP $(INTT) $(INTE) $(CODE) $(PD) $(MEM)
-PCFLAGS = -std=c++14 -fopenmp -march=native -O3 -DOPENMP $(INTT) $(INTE) $(CODE) $(PD) $(MEM) -fpass-plugin=/home/jiguanglizipao/ScalableCache/build-new/llvm-plugin/ScalableCacheInstrument/ScalableCacheInstrument.so -fpass-plugin=/home/jiguanglizipao/ScalableCache/build-new/llvm-plugin/ScalableCacheAlloc/ScalableCacheAlloc.so -L/home/jiguanglizipao/ScalableCache/build-new -lcache -pthread -lboost_fiber -lboost_context -lboost_thread -lnuma -pthread -ldl -fopenmp $(shell pkg-config --libs spdk_nvme spdk_env_dpdk spdk_syslibs) -L/home/blealtancao/mimalloc/install/lib -lmimalloc -flto=thin #-L/home/jiguanglizipao/.local/liburing/lib -luring
+PCFLAGS = -std=c++14 -fopenmp -march=native -O3 -DOPENMP $(INTT) $(INTE) $(CODE) $(PD) $(MEM) -DWITH_CACHE -fpass-plugin=/home/jiguanglizipao/ScalableCache/build-new/llvm-plugin/ScalableCacheInstrument/ScalableCacheInstrument.so -fpass-plugin=/home/jiguanglizipao/ScalableCache/build-new/llvm-plugin/ScalableCacheAlloc/ScalableCacheAlloc.so -L/home/jiguanglizipao/ScalableCache/build-new -flto=thin -lcache -pthread -lboost_fiber -lboost_context -lboost_thread -lnuma -pthread -ldl -fopenmp $(shell pkg-config --libs spdk_nvme spdk_env_dpdk spdk_syslibs) -L/home/blealtancao/mimalloc/install/lib -lmimalloc
 
 else
 PCC = g++

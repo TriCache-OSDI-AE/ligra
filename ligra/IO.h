@@ -317,6 +317,25 @@ graph<vertex> readGraphFromFile(char* fname, bool isSymmetric, bool mmap) {
 
 template <class vertex>
 graph<vertex> readGraphFromBinary(char* iFile, bool isSymmetric) {
+  // single-threaded reading with swap is too slow
+  auto parallel_read = [](const char* file, char *dst, long size)
+  {
+    #pragma omp parallel
+    {
+      auto num_threads = omp_get_num_threads();
+      auto thread_id = omp_get_thread_num();
+      ifstream subin(file,ifstream::in | ios::binary); //stored as longs
+      const long chunk = 32 * 1024 * 1024;
+      #pragma omp for schedule(dynamic, 1)
+      for(long i = 0; i < size; i += chunk)
+      {
+        subin.seekg(i);
+        subin.read(dst + i, std::min(size, i + chunk) - i);
+      }
+      subin.close();
+    }
+  };
+
   char* config = (char*) ".config";
   char* adj = (char*) ".adj";
   char* idx = (char*) ".idx";
@@ -346,7 +365,8 @@ graph<vertex> readGraphFromBinary(char* iFile, bool isSymmetric) {
   long m = size/sizeof(uint);
 #endif
   char* s = (char *) malloc(size);
-  in2.read(s,size);
+  parallel_read(adjFile, s, size);
+  // in2.read(s,size);
   in2.close();
   uintE* edges = (uintE*) s;
 
@@ -357,7 +377,8 @@ graph<vertex> readGraphFromBinary(char* iFile, bool isSymmetric) {
   if(n != size/sizeof(intT)) { cout << "File size wrong\n"; abort(); }
 
   char* t = (char *) malloc(size);
-  in3.read(t,size);
+  parallel_read(idxFile, t, size);
+  // in3.read(t,size);
   in3.close();
   uintT* offsets = (uintT*) t;
 
@@ -398,7 +419,8 @@ graph<vertex> readGraphFromBinary(char* iFile, bool isSymmetric) {
     long size = in4.tellg();
     in4.seekg(0);
     char* rs = (char *) malloc(size);
-    in4.read(rs,size);
+    parallel_read(radjFile, rs, size);
+    // in4.read(rs,size);
     in4.close();
     uintE* redges = (uintE*) rs;
 
@@ -409,7 +431,8 @@ graph<vertex> readGraphFromBinary(char* iFile, bool isSymmetric) {
     if(n != size/sizeof(intT)) { cout << "File size wrong\n"; abort(); }
 
     char* rt = (char *) malloc(size);
-    in5.read(rt,size);
+    parallel_read(ridxFile, rt, size);
+    // in5.read(rt,size);
     in5.close();
     uintT* roffsets = (uintT*) rt;
 

@@ -51,6 +51,12 @@ void Compute(graph<vertex>& GA, commandLine P) {
     Frontier.del();
     Frontier = output; //set new frontier
   } 
+
+  // long num_visited = 0;
+  // #pragma omp parallel for schedule(runtime) reduction(+:num_visited)
+  // for(long i=0;i<n;i++) num_visited += Parent[i];
+  // printf("visited %lu vertices from %lu\n", num_visited, start);
+
   Frontier.del();
   free(Parent); 
 }
