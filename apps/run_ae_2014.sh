@@ -16,9 +16,7 @@ function set_schedule {
 	export OMP_SCHEDULE="${SCHEDULE}"
 }
 
-export MALLOC_PATH="${TIME}"
-mkdir -p results/$MALLOC_PATH
-cp $0 results/$MALLOC_PATH
+mkdir -p results_ligra_cache
 
 export CACHE_MALLOC_THRESHOLD=$(expr 4294967296 \* 32)
 for threads in 240
@@ -34,14 +32,14 @@ do
 
         set_schedule "dynamic,256"
  	    sudo -E LD_LIBRARY_PATH="$LD_LIBRARY_PATH" numactl -i all -C !0,128,16,144,32,160,48,176,64,192,80,208,96,224,112,240 \
-             stdbuf -oL /usr/bin/time -v ./BFS -r 5 -b /mnt/data/TriCache/ligra/uk-2014 2>&1 | tee results/$MALLOC_PATH/BFS_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
+             stdbuf -oL /usr/bin/time -v ./BFS-cache -r 5 -b /mnt/data/TriCache/ligra/uk-2014 2>&1 | tee results_ligra_cache/BFS_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
 
         set_schedule "guided"
         sudo -E LD_LIBRARY_PATH="$LD_LIBRARY_PATH" numactl -i all -C !0,128,16,144,32,160,48,176,64,192,80,208,96,224,112,240 \
-             stdbuf -oL /usr/bin/time -v ./PageRankDelta -maxiters 20 -b /mnt/data/TriCache/ligra/uk-2014 2>&1 | tee results/$MALLOC_PATH/PageRank_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
+             stdbuf -oL /usr/bin/time -v ./PageRankDelta-cache -maxiters 20 -b /mnt/data/TriCache/ligra/uk-2014 2>&1 | tee results_ligra_cache/PageRank_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
 
  	    sudo -E LD_LIBRARY_PATH="$LD_LIBRARY_PATH" numactl -i all -C !0,128,16,144,32,160,48,176,64,192,80,208,96,224,112,240 \
-             stdbuf -oL /usr/bin/time -v ./Components -s -b /mnt/data/TriCache/ligra/uk-2014-sym 2>&1 | tee results/$MALLOC_PATH/CC_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
+             stdbuf -oL /usr/bin/time -v ./Components-cache -s -b /mnt/data/TriCache/ligra/uk-2014-sym 2>&1 | tee results_ligra_cache/CC_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
 
     done
 done
@@ -60,7 +58,7 @@ do
 
         set_schedule "dynamic,256"
  	    sudo -E LD_LIBRARY_PATH="$LD_LIBRARY_PATH" numactl -i all -C !0,128,16,144,32,160,48,176,64,192,80,208,96,224,112,240 \
-             stdbuf -oL /usr/bin/time -v ./BFS -r 5 -b /mnt/data/TriCache/ligra/uk-2014 2>&1 | tee results/$MALLOC_PATH/BFS_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
+             stdbuf -oL /usr/bin/time -v ./BFS-cache -r 5 -b /mnt/data/TriCache/ligra/uk-2014 2>&1 | tee results_ligra_cache/BFS_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
 
     done
 done
@@ -79,12 +77,12 @@ do
 
         set_schedule "static,64"
         sudo -E LD_LIBRARY_PATH="$LD_LIBRARY_PATH" numactl -i all -C !0,128,16,144,32,160,48,176,64,192,80,208,96,224,112,240 \
-            stdbuf -oL /usr/bin/time -v ./PageRankDelta -maxiters 20 -b /mnt/data/TriCache/ligra/uk-2014 2>&1 | tee results/$MALLOC_PATH/PageRank_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
+            stdbuf -oL /usr/bin/time -v ./PageRankDelta-cache -maxiters 20 -b /mnt/data/TriCache/ligra/uk-2014 2>&1 | tee results_ligra_cache/PageRank_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
 
 
         set_schedule "dynamic,64"
 	    sudo -E LD_LIBRARY_PATH="$LD_LIBRARY_PATH" numactl -i all -C !0,128,16,144,32,160,48,176,64,192,80,208,96,224,112,240 \
-            stdbuf -oL /usr/bin/time -v ./Components -s -b /mnt/data/TriCache/ligra/uk-2014-sym 2>&1 | tee results/$MALLOC_PATH/CC_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
+            stdbuf -oL /usr/bin/time -v ./Components-cache -s -b /mnt/data/TriCache/ligra/uk-2014-sym 2>&1 | tee results_ligra_cache/CC_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
 
     done
 done
@@ -103,13 +101,13 @@ do
         echo $CACHE_PHY_SIZE $CACHE_VIRT_SIZE
 
 	    sudo -E LD_LIBRARY_PATH="$LD_LIBRARY_PATH" numactl -i all -C !0,128,16,144,32,160,48,176,64,192,80,208,96,224,112,240 \
-            stdbuf -oL /usr/bin/time -v ./BFS -r 5 -b /mnt/data/TriCache/ligra/uk-2014 2>&1 | tee results/$MALLOC_PATH/BFS_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
+            stdbuf -oL /usr/bin/time -v ./BFS-cache -r 5 -b /mnt/data/TriCache/ligra/uk-2014 2>&1 | tee results_ligra_cache/BFS_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
 
         sudo -E LD_LIBRARY_PATH="$LD_LIBRARY_PATH" numactl -i all -C !0,128,16,144,32,160,48,176,64,192,80,208,96,224,112,240 \
-            stdbuf -oL /usr/bin/time -v ./PageRankDelta -maxiters 20 -b /mnt/data/TriCache/ligra/uk-2014 2>&1 | tee results/$MALLOC_PATH/PageRank_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
+            stdbuf -oL /usr/bin/time -v ./PageRankDelta-cache -maxiters 20 -b /mnt/data/TriCache/ligra/uk-2014 2>&1 | tee results_ligra_cache/PageRank_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
 
 	    sudo -E LD_LIBRARY_PATH="$LD_LIBRARY_PATH" numactl -i all -C !0,128,16,144,32,160,48,176,64,192,80,208,96,224,112,240 \
-            stdbuf -oL /usr/bin/time -v ./Components -s -b /mnt/data/TriCache/ligra/uk-2014-sym 2>&1 | tee results/$MALLOC_PATH/CC_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
+            stdbuf -oL /usr/bin/time -v ./Components-cache -s -b /mnt/data/TriCache/ligra/uk-2014-sym 2>&1 | tee results_ligra_cache/CC_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
 
     done
 done
@@ -121,49 +119,24 @@ do
     export CACHE_NUM_CLIENTS=$threads
     export OMP_NUM_THREADS=$threads
 
-    for i in 64
-    do
-        echo $(expr \( $i \/ 8 + 26 \) \* 1024 \* 1024 \* 1024) | sudo tee /sys/fs/cgroup/limit/memory.max
-        export CACHE_PHY_SIZE=$(expr \( $i - $i \/ 8 - 26 \) \* 1024 \* 1024 \* 1024 )
-        echo $CACHE_PHY_SIZE $CACHE_VIRT_SIZE
-
-	    sudo -E LD_LIBRARY_PATH="$LD_LIBRARY_PATH" numactl -i all -C !0,128,16,144,32,160,48,176,64,192,80,208,96,224,112,240 \
-            stdbuf -oL /usr/bin/time -v ./BFS -r 5 -b /mnt/data/TriCache/ligra/uk-2014 2>&1 | tee results/$MALLOC_PATH/BFS_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
-
-        sudo -E LD_LIBRARY_PATH="$LD_LIBRARY_PATH" numactl -i all -C !0,128,16,144,32,160,48,176,64,192,80,208,96,224,112,240 \
-            stdbuf -oL /usr/bin/time -v ./PageRankDelta -maxiters 20 -b /mnt/data/TriCache/ligra/uk-2014 2>&1 | tee results/$MALLOC_PATH/PageRank_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
-
-	    sudo -E LD_LIBRARY_PATH="$LD_LIBRARY_PATH" numactl -i all -C !0,128,16,144,32,160,48,176,64,192,80,208,96,224,112,240 \
-            stdbuf -oL /usr/bin/time -v ./Components -s -b /mnt/data/TriCache/ligra/uk-2014-sym 2>&1 | tee results/$MALLOC_PATH/CC_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
-
-    done
-done
-
-export CACHE_MALLOC_THRESHOLD=$(expr 4294967296 \* 2)
-set_schedule "dynamic,64"
-for threads in 960
-do
-    export CACHE_NUM_CLIENTS=$threads
-    export OMP_NUM_THREADS=$threads
-
-    for i in 32
+    for i in 64 32
     do
         echo $(expr \( $i \/ 8 + 24 \) \* 1024 \* 1024 \* 1024) | sudo tee /sys/fs/cgroup/limit/memory.max
         export CACHE_PHY_SIZE=$(expr \( $i - $i \/ 8 - 24 \) \* 1024 \* 1024 \* 1024 )
         echo $CACHE_PHY_SIZE $CACHE_VIRT_SIZE
 
 	    sudo -E LD_LIBRARY_PATH="$LD_LIBRARY_PATH" numactl -i all -C !0,128,16,144,32,160,48,176,64,192,80,208,96,224,112,240 \
-            stdbuf -oL /usr/bin/time -v ./BFS -r 5 -b /mnt/data/TriCache/ligra/uk-2014 2>&1 | tee results/$MALLOC_PATH/BFS_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
+            stdbuf -oL /usr/bin/time -v ./BFS-cache -r 5 -b /mnt/data/TriCache/ligra/uk-2014 2>&1 | tee results_ligra_cache/BFS_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
 
 	    sudo -E LD_LIBRARY_PATH="$LD_LIBRARY_PATH" numactl -i all -C !0,128,16,144,32,160,48,176,64,192,80,208,96,224,112,240 \
-            stdbuf -oL /usr/bin/time -v ./Components -s -b /mnt/data/TriCache/ligra/uk-2014-sym 2>&1 | tee results/$MALLOC_PATH/CC_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
+            stdbuf -oL /usr/bin/time -v ./Components-cache -s -b /mnt/data/TriCache/ligra/uk-2014-sym 2>&1 | tee results_ligra_cache/CC_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
 
         echo $(expr \( $i \/ 8 + 27 \) \* 1024 \* 1024 \* 1024) | sudo tee /sys/fs/cgroup/limit/memory.max
         export CACHE_PHY_SIZE=$(expr \( $i - $i \/ 8 - 27 \) \* 1024 \* 1024 \* 1024 )
         echo $CACHE_PHY_SIZE $CACHE_VIRT_SIZE
 
         sudo -E LD_LIBRARY_PATH="$LD_LIBRARY_PATH" numactl -i all -C !0,128,16,144,32,160,48,176,64,192,80,208,96,224,112,240 \
-            stdbuf -oL /usr/bin/time -v ./PageRankDelta -maxiters 20 -b /mnt/data/TriCache/ligra/uk-2014 2>&1 | tee results/$MALLOC_PATH/PageRank_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
+            stdbuf -oL /usr/bin/time -v ./PageRankDelta-cache -maxiters 20 -b /mnt/data/TriCache/ligra/uk-2014 2>&1 | tee results_ligra_cache/PageRank_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
 
     done
 done
@@ -182,17 +155,17 @@ do
         echo $CACHE_PHY_SIZE $CACHE_VIRT_SIZE
 
 	    sudo -E LD_LIBRARY_PATH="$LD_LIBRARY_PATH" numactl -i all -C !0,128,16,144,32,160,48,176,64,192,80,208,96,224,112,240 \
-            stdbuf -oL /usr/bin/time -v ./BFS -r 5 -b /mnt/data/TriCache/ligra/uk-2014 2>&1 | tee results/$MALLOC_PATH/BFS_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
+            stdbuf -oL /usr/bin/time -v ./BFS-cache -r 5 -b /mnt/data/TriCache/ligra/uk-2014 2>&1 | tee results_ligra_cache/BFS_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
 
 	    sudo -E LD_LIBRARY_PATH="$LD_LIBRARY_PATH" numactl -i all -C !0,128,16,144,32,160,48,176,64,192,80,208,96,224,112,240 \
-            stdbuf -oL /usr/bin/time -v ./PageRankDelta -maxiters 20 -b /mnt/data/TriCache/ligra/uk-2014 2>&1 | tee results/$MALLOC_PATH/PageRank_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
+            stdbuf -oL /usr/bin/time -v ./PageRankDelta-cache -maxiters 20 -b /mnt/data/TriCache/ligra/uk-2014 2>&1 | tee results_ligra_cache/PageRank_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
 
         echo $(expr \( $i \/ 8 + 11 \) \* 1024 \* 1024 \* 1024) | sudo tee /sys/fs/cgroup/limit/memory.max
         export CACHE_PHY_SIZE=$(expr \( $i - $i \/ 8 - 11 \) \* 1024 \* 1024 \* 1024 )
         echo $CACHE_PHY_SIZE $CACHE_VIRT_SIZE
 
         sudo -E LD_LIBRARY_PATH="$LD_LIBRARY_PATH" numactl -i all -C !0,128,16,144,32,160,48,176,64,192,80,208,96,224,112,240 \
-            stdbuf -oL /usr/bin/time -v ./Components -s -b /mnt/data/TriCache/ligra/uk-2014-sym 2>&1 | tee results/$MALLOC_PATH/CC_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
+            stdbuf -oL /usr/bin/time -v ./Components-cache -s -b /mnt/data/TriCache/ligra/uk-2014-sym 2>&1 | tee results_ligra_cache/CC_uk-2014_${i}G_${threads}_${SCHEDULE}.txt
 
     done
 done
