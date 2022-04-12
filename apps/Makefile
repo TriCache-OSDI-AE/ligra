@@ -38,8 +38,8 @@ else ifdef OPENMP
 PCC = clang++-13
 PCFLAGS = -std=c++14 -fopenmp -march=native -O3 -DOPENMP $(INTT) $(INTE) $(CODE) $(PD) $(MEM)
 
-CACHE_PATH=/home/jiguanglizipao/ScalableCache/build-new
-CACHE_PCFLAGS = -std=c++14 -fopenmp -march=native -O3 -DOPENMP $(INTT) $(INTE) $(CODE) $(PD) $(MEM) -DWITH_CACHE -fpass-plugin=$(CACHE_PATH)/llvm-plugin/ScalableCacheInstrument/ScalableCacheInstrument.so -fpass-plugin=$(CACHE_PATH)/llvm-plugin/ScalableCacheAlloc/ScalableCacheAlloc.so -L$(CACHE_PATH) -flto=thin
+CACHE_PATH=$(TRICACHE_ROOT)/build
+CACHE_PCFLAGS = -std=c++14 -fopenmp -march=native -O3 -DOPENMP $(INTT) $(INTE) $(CODE) $(PD) $(MEM) -DWITH_CACHE -fpass-plugin=$(CACHE_PATH)/llvm-plugin/TriCacheInstrument/TriCacheInstrument.so -fpass-plugin=$(CACHE_PATH)/llvm-plugin/TriCacheAlloc/TriCacheAlloc.so -L$(CACHE_PATH) -flto=thin
 CACHE_LDFLAGS = -pthread -lboost_fiber -lboost_context -lboost_thread -lnuma -pthread -ldl -fopenmp $(shell pkg-config --libs spdk_nvme spdk_env_dpdk spdk_syslibs)
 
 else
@@ -51,7 +51,7 @@ COMMON= ligra.h graph.h compressedVertex.h vertex.h utils.h IO.h parallel.h gett
 
 ALL= encoder decoder BFS BC BellmanFord Components Components-Shortcut Radii PageRank PageRankDelta BFSCC BFS-Bitvector KCore MIS Triangle CF
 
-ALL_CACHE= BFS-cache Components-cache PageRankDelta-cache
+ALL_CACHE= BFS-cache Components-cache PageRankDelta-cache convert_to_ligra
 ALL_CACHE_PROFILE= BFS-cache-profile Components-cache-profile PageRankDelta-cache-profile
 ALL_CACHE_DISABLE_DIRECT= BFS-cache-disable-direct Components-cache-disable-direct PageRankDelta-cache-disable-direct
 ALL_CACHE_DISABLE_PRIVATE= BFS-cache-disable-private Components-cache-disable-private PageRankDelta-cache-disable-private
